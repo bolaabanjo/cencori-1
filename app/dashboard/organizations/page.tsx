@@ -90,7 +90,7 @@ export default function OrganizationsPage() {
   if (!organizations || organizations.length === 0) {
     return (
       <div className="text-center p-10 border rounded-lg">
-        <p className="text-xl mb-4">You don't have any organizations yet.</p>
+        <p className="text-xl mb-4">You don&apos;t have any organizations yet.</p>
         <Button asChild>
           <Link href="/dashboard/organizations/new">Create Your First Organization</Link>
         </Button>
