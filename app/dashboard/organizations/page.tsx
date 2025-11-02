@@ -73,7 +73,7 @@ export default function OrganizationsPage() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-theme(spacing.16))]">
-        <p className="text-xl">Loading organizations...</p>
+        <p className="text-sm">Loading organizations...</p>
       </div>
     );
   }
@@ -90,7 +90,7 @@ export default function OrganizationsPage() {
   if (!organizations || organizations.length === 0) {
     return (
       <div className="text-center p-10 border rounded-lg">
-        <p className="text-xl mb-4">You don&apos;t have any organizations yet.</p>
+        <p className="text-sm mb-4">You don&apos;t have any organizations yet.</p>
         <Button asChild>
           <Link href="/dashboard/organizations/new">Create Your First Organization</Link>
         </Button>
