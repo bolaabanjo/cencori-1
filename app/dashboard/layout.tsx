@@ -18,7 +18,7 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-  // BreadcrumbEllipsis, // Removed unused import
+  BreadcrumbEllipsis,
 } from "@/components/ui/breadcrumb";
 import { Input } from "@/components/ui/input";
 import {
@@ -26,7 +26,7 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-  // SelectLabel, // Removed unused import
+  SelectLabel,
   SelectSeparator,
   SelectValue,
   SelectPrimitive,
@@ -35,7 +35,7 @@ import { ChevronsUpDown, PlusCircle, Search } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr"; // Import createBrowserClient
 import { useIsMobile } from "@/hooks/use-mobile";
-import MobileLayout from "./mobile-layout";
+import MobileLayout from "./organizations/[orgSlug]/mobile-layout";
 
 // Optional header/nav links later
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -188,7 +188,7 @@ function DesktopLayoutContent({ user, avatar, name, children }: LayoutContentPro
     };
 
     fetchOrgAndProjects();
-  }, [user, supabase]); // Add supabase to dependency array
+  }, [user]); // Re-fetch if the authenticated user changes
 
   const getOrgSlug = () => {
     const match = pathname.match(/organizations\/([^/]+)/);

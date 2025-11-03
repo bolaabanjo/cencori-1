@@ -16,15 +16,13 @@ import {
   SidebarRail,
   SidebarGroup,
   SidebarGroupLabel,
+  SidebarGroupAction,
+  SidebarInput,
+  SidebarSeparator,
   SidebarFooter,
 } from "@/components/ui/sidebar";
-import { SettingsIcon } from "@/components/animate-ui/icons/settings";
-import { LayersIcon } from "@/components/animate-ui/icons/layers";
-import { UnplugIcon } from "@/components/animate-ui/icons/unplug";
-import { ActivityIcon } from "@/components/animate-ui/icons/activity";
-import { PanelTopIcon } from "@/components/animate-ui/icons/panel-top";
-import { UserRoundIcon } from "@/components/animate-ui/icons/user-round";
-import { Home } from "lucide-react";
+import { Settings, Package, Users, Handshake, CreditCard, SettingsIcon, UserCircle, UnplugIcon, Activity, Unplug, Layers, PanelTop } from "lucide-react";
+
 
 interface OrganizationData {
   id: string;
@@ -109,26 +107,13 @@ export default function OrganizationLayout({
   return (
     <SidebarProvider defaultOpen={true}>
       <Sidebar collapsible="icon" className="top-12 h-[calc(100vh-3rem)] ">
-        <SidebarHeader className="relative min-h-12 border-b pl-4 pr-1 transition-[padding] duration-200 ease-linear group-data-[collapsible=icon]/sidebar:pl-[var(--sidebar-width-icon)]">
-          <Link
-            href={`/dashboard/organizations/${orgSlug}/projects`}
-            className="flex items-center gap-2"
-          >
-            <Home />
-            <span className="text-sm font-medium">Dashboard</span>
-          </Link>
-          <div className="absolute right-2 top-1/2 -translate-y-1/2">
-            <SidebarTrigger />
-          </div>
-        </SidebarHeader>
-
         <SidebarContent>
           <SidebarGroup className="pt-4">
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip="Projects">
                   <Link href={`/dashboard/organizations/${orgSlug}/projects`}>
-                    <LayersIcon animateOnHover/>
+                    <Layers/>
                     <span>Projects</span>
                   </Link>
                 </SidebarMenuButton>
@@ -136,7 +121,7 @@ export default function OrganizationLayout({
               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip="Billing">
                   <Link href={`/dashboard/organizations/${orgSlug}/billing`}>
-                    <PanelTopIcon animateOnHover/>
+                    <CreditCard/>
                     <span>Billing</span>
                   </Link>
                 </SidebarMenuButton>
@@ -144,7 +129,7 @@ export default function OrganizationLayout({
               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip="Usage">
                   <Link href={`/dashboard/organizations/${orgSlug}/usage`}>
-                    <ActivityIcon animateOnHover/>
+                    <Activity/>
                     <span>Usage</span>
                   </Link>
                 </SidebarMenuButton>
@@ -152,7 +137,7 @@ export default function OrganizationLayout({
               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip="Integrations">
                   <Link href={`/dashboard/organizations/${orgSlug}/integrations`}>
-                    <UnplugIcon animateOnHover/>
+                    <Unplug/>
                     <span>Integrations</span>
                   </Link>
                 </SidebarMenuButton>
@@ -160,7 +145,7 @@ export default function OrganizationLayout({
               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip="Teams">
                   <Link href={`/dashboard/organizations/${orgSlug}/teams`}>
-                    <UserRoundIcon animateOnHover/>
+                    <UserCircle/>
                     <span>Teams</span>
                   </Link>
                 </SidebarMenuButton>
@@ -168,7 +153,7 @@ export default function OrganizationLayout({
               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip="Settings">
                   <Link href={`/dashboard/organizations/${orgSlug}/settings`}>
-                    <SettingsIcon animateOnHover />
+                    <SettingsIcon />
                     <span>Settings</span>
                   </Link>
                 </SidebarMenuButton>

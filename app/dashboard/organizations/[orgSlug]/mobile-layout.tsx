@@ -6,15 +6,15 @@ import { useRouter } from "next/navigation";
 import { Logo } from "@/components/logo";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
-import { LogOut, CircleUserRound, CreditCard, Settings, Home, Users, UserPlus } from "lucide-react";
+import { LogOut, CircleUserRound, CreditCard, Settings, Home, Users, UserPlus, Activity, Layers, UserCircle, Unplug } from "lucide-react";
 import Link from "next/link";
 import {
   Breadcrumb,
   BreadcrumbItem,
-  // BreadcrumbLink,
+  BreadcrumbLink,
   BreadcrumbList,
-  // BreadcrumbPage,
-  // BreadcrumbSeparator,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Input } from "@/components/ui/input";
 import {
@@ -22,7 +22,7 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-  // SelectLabel,
+  SelectLabel,
   SelectSeparator,
   SelectValue,
   SelectPrimitive,
@@ -33,16 +33,16 @@ import { createBrowserClient } from "@supabase/ssr";
 import {
   Sidebar,
   SidebarContent,
-  // SidebarHeader,
+  SidebarHeader,
   SidebarProvider,
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarTrigger,
   SidebarGroup,
-  // SidebarGroupLabel,
+  SidebarGroupLabel,
 } from "@/components/ui/sidebar";
-// import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Package, Handshake } from "lucide-react";
 
 type UserType = {
@@ -159,7 +159,7 @@ export default function MobileLayout({ user, avatar, name, children }: MobileLay
               </Link>
 
               {/* breadcrumbs wrapper: allow truncation and avoid large inline blocks */}
-              <div className="sm:flex items-center min-w-0">
+              <div className="sm:flex items-center">
                 <Breadcrumb className="flex items-center">
                   <BreadcrumbList>
                     {orgSlug && (
@@ -177,7 +177,7 @@ export default function MobileLayout({ user, avatar, name, children }: MobileLay
                           <SelectPrimitive.Trigger className="flex h-8 cursor-pointer items-center justify-between p-1.5 text-foreground min-w-[120px]">
                             <SelectValue className="truncate">{currentOrg?.name || "Organizations"}</SelectValue>
                             <SelectPrimitive.Icon asChild>
-                              <ChevronsUpDown size={14} className="ml-[-16] text-muted-foreground/80" />
+                              <ChevronsUpDown size={14} className="ml-2 text-muted-foreground/80" />
                             </SelectPrimitive.Icon>
                           </SelectPrimitive.Trigger>
 
@@ -366,7 +366,7 @@ export default function MobileLayout({ user, avatar, name, children }: MobileLay
                     <SidebarMenuItem>
                       <SidebarMenuButton asChild tooltip="Projects">
                         <Link href={`/dashboard/organizations/${orgSlug}/projects`}>
-                          <Package />
+                          <Layers />
                           <span>Projects</span>
                         </Link>
                       </SidebarMenuButton>
@@ -384,7 +384,7 @@ export default function MobileLayout({ user, avatar, name, children }: MobileLay
                     <SidebarMenuItem>
                       <SidebarMenuButton asChild tooltip="Usage">
                         <Link href={`/dashboard/organizations/${orgSlug}/usage`}>
-                          <Handshake />
+                          <Activity />
                           <span>Usage</span>
                         </Link>
                       </SidebarMenuButton>
@@ -393,7 +393,7 @@ export default function MobileLayout({ user, avatar, name, children }: MobileLay
                     <SidebarMenuItem>
                       <SidebarMenuButton asChild tooltip="Integrations">
                         <Link href={`/dashboard/organizations/${orgSlug}/integrations`}>
-                          <Users />
+                          <Unplug />
                           <span>Integrations</span>
                         </Link>
                       </SidebarMenuButton>
@@ -402,7 +402,7 @@ export default function MobileLayout({ user, avatar, name, children }: MobileLay
                     <SidebarMenuItem>
                       <SidebarMenuButton asChild tooltip="Teams">
                         <Link href={`/dashboard/organizations/${orgSlug}/teams`}>
-                          <Users />
+                          <UserCircle />
                           <span>Teams</span>
                         </Link>
                       </SidebarMenuButton>
