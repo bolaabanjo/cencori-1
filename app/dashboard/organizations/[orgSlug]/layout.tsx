@@ -1,13 +1,12 @@
 "use client"
 
 import React, { useEffect, useState } from "react";
-import { notFound, redirect } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import Link from "next/link";
 import {
   Sidebar,
   SidebarContent,
-  SidebarHeader,
   SidebarProvider,
   SidebarMenu,
   SidebarMenuItem,
@@ -16,12 +15,13 @@ import {
   SidebarRail,
   SidebarGroup,
   SidebarGroupLabel,
-  SidebarGroupAction,
-  SidebarInput,
-  SidebarSeparator,
-  SidebarFooter,
 } from "@/components/ui/sidebar";
-import { Settings, Package, Users, Handshake, CreditCard, SettingsIcon, UserCircle, UnplugIcon, Activity, Unplug, Layers, PanelTop } from "lucide-react";
+import { LayersIcon } from "@/components/animate-ui/icons/layers";
+import { SettingsIcon } from "@/components/animate-ui/icons/settings";
+import { PanelTopIcon } from "@/components/animate-ui/icons/panel-top";
+import { ActivityIcon } from "@/components/animate-ui/icons/activity";
+import { UnplugIcon } from "@/components/animate-ui/icons/unplug";
+import { UserRoundIcon } from "@/components/animate-ui/icons/user-round";
 
 
 interface OrganizationData {
@@ -38,6 +38,7 @@ export default function OrganizationLayout({
   params: { orgSlug: string };
 }) {
   const { orgSlug } = params;
+  const router = useRouter();
   const [organization, setOrganization] = useState<OrganizationData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -50,7 +51,7 @@ export default function OrganizationLayout({
         const { data: { user }, error: userError } = await supabase.auth.getUser();
 
         if (userError || !user) {
-          redirect("/login");
+          router.push("/login");
           return;
         }
 
@@ -77,7 +78,7 @@ export default function OrganizationLayout({
     };
 
     fetchOrganization();
-  }, [orgSlug]);
+  }, [orgSlug, router]);
 
 
   if (loading) {
@@ -113,15 +114,23 @@ export default function OrganizationLayout({
               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip="Projects">
                   <Link href={`/dashboard/organizations/${orgSlug}/projects`}>
-                    <Layers/>
+                    <LayersIcon animateOnHover/>
                     <span>Projects</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip="Settings">
+                  <Link href={`/dashboard/organizations/${orgSlug}/settings`}>
+                    <SettingsIcon animateOnHover/>
+                    <span>Settings</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip="Billing">
                   <Link href={`/dashboard/organizations/${orgSlug}/billing`}>
-                    <CreditCard/>
+                    <PanelTopIcon animateOnHover/>
                     <span>Billing</span>
                   </Link>
                 </SidebarMenuButton>
@@ -129,7 +138,7 @@ export default function OrganizationLayout({
               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip="Usage">
                   <Link href={`/dashboard/organizations/${orgSlug}/usage`}>
-                    <Activity/>
+                    <ActivityIcon animateOnHover/>
                     <span>Usage</span>
                   </Link>
                 </SidebarMenuButton>
@@ -137,7 +146,7 @@ export default function OrganizationLayout({
               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip="Integrations">
                   <Link href={`/dashboard/organizations/${orgSlug}/integrations`}>
-                    <Unplug/>
+                    <UnplugIcon animateOnHover/>
                     <span>Integrations</span>
                   </Link>
                 </SidebarMenuButton>
@@ -145,16 +154,8 @@ export default function OrganizationLayout({
               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip="Teams">
                   <Link href={`/dashboard/organizations/${orgSlug}/teams`}>
-                    <UserCircle/>
+                    <UserRoundIcon animateOnHover/>
                     <span>Teams</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Settings">
-                  <Link href={`/dashboard/organizations/${orgSlug}/settings`}>
-                    <SettingsIcon />
-                    <span>Settings</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -162,9 +163,9 @@ export default function OrganizationLayout({
           </SidebarGroup>
         </SidebarContent>
         <SidebarRail />
-        <SidebarFooter>
+        <div className="absolute bottom-0 left-0 w-full p-2">
           <SidebarTrigger />
-        </SidebarFooter>
+        </div>
       </Sidebar>
       <main className="flex w-full flex-1 flex-col overflow-hidden">
         {children}
