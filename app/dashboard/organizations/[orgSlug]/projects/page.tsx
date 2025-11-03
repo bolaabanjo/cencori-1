@@ -193,7 +193,7 @@ export default function OrgProjectsPage({ params }: { params: { orgSlug: string 
               <TableHead className="text-right"></TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody>
+          <TableBody className="border">
             {projects.filter(project =>
               project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
               project.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -209,7 +209,17 @@ export default function OrgProjectsPage({ params }: { params: { orgSlug: string 
                     {project.visibility.charAt(0).toUpperCase() + project.visibility.slice(1)}
                   </Badge>
                 </TableCell>
-                <TableCell>{new Date(project.created_at).toLocaleDateString()}</TableCell>
+                <TableCell>
+                  {(() => {
+                    const date = new Date(project.created_at);
+                    const day = date.getDate().toString().padStart(2, '0');
+                    const month = date.toLocaleString('en-US', { month: 'short' });
+                    const hours = date.getHours().toString().padStart(2, '0');
+                    const minutes = date.getMinutes().toString().padStart(2, '0');
+                    const seconds = date.getSeconds().toString().padStart(2, '0');
+                    return `${day} ${month} ${hours}:${minutes}:${seconds}`;
+                  })()}
+                </TableCell>
                 <TableCell className="text-right">
                   <div className="flex items-center justify-end space-x-2">
                     <Badge variant={'outline'} className="gap-1.5 flex items-center">
