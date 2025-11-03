@@ -34,12 +34,15 @@ import {
 import { ChevronsUpDown, PlusCircle, Search } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr"; // Import createBrowserClient
+import { useIsMobile } from "@/hooks/use-mobile";
+import MobileLayout from "./mobile-layout";
 
 // Optional header/nav links later
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<unknown | null>(null);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     let mounted = true;
@@ -78,13 +81,25 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     typedUser.email?.split?.("@")[0] ??
     null;
 
+  if (isMobile) {
+    return (
+      <MobileLayout
+        user={typedUser}
+        avatar={avatar}
+        name={name}
+      >
+        {children}
+      </MobileLayout>
+    );
+  }
+
   return (
-    <LayoutContent
+    <DesktopLayoutContent
       user={typedUser}
       avatar={avatar}
       name={name}>
       {children}
-    </LayoutContent>
+    </DesktopLayoutContent>
   );
 }
 
@@ -114,7 +129,7 @@ interface LayoutContentProps {
   children: React.ReactNode;
 }
 
-function LayoutContent({ user, avatar, name, children }: LayoutContentProps) {
+function DesktopLayoutContent({ user, avatar, name, children }: LayoutContentProps) {
   const router = useRouter();
   const pathname = usePathname();
 
