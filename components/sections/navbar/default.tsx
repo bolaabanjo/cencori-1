@@ -358,19 +358,7 @@ export default function Navbar({
                 return (
                   <Button
                     key={index}
-                    variant={
-                      action.variant && 
-                      ["default", "link", "destructive", "outline", "glow", "secondary", "ghost"].includes(action.variant)
-                        ? action.variant as
-                            | "default"
-                            | "link"
-                            | "destructive"
-                            | "outline"
-                            | "glow"
-                            | "secondary"
-                            | "ghost"
-                        : "default"
-                    }
+                 
                     asChild
                   >
                     <a href={action.href}>
