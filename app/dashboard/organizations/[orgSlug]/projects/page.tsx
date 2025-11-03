@@ -182,7 +182,6 @@ export default function OrgProjectsPage({ params }: { params: { orgSlug: string 
       {/* Filter projects based on search term */}
       {projects && projects.length > 0 ? (
         <Table>
-          <TableCaption>A list of your projects within {organization.name}.</TableCaption>
           <TableHeader className="bg-muted/50">
             <TableRow className="bg-muted/50">
               <TableHead>PROJECT</TableHead>
