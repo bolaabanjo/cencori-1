@@ -184,8 +184,8 @@ export default function OrgProjectsPage({ params }: { params: { orgSlug: string 
       {projects && projects.length > 0 ? (
         <Table>
           <TableCaption>A list of your projects within {organization.name}.</TableCaption>
-          <TableHeader className="border bg-muted/50">
-            <TableRow className="border bg-muted/50">
+          <TableHeader className=" bg-muted/50">
+            <TableRow className=" bg-muted/50">
               <TableHead>PROJECT</TableHead>
               <TableHead>VISIBILITY</TableHead>
               <TableHead>DATE CREATED</TableHead>

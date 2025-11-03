@@ -193,16 +193,16 @@ function LayoutContent({ user, avatar, name, children }: LayoutContentProps) {
 
   return (
     <div className="min-h-screen bg-white-50 dark:bg-black transition-colors">
-      <header className="h-12 border-b border-zinc-100 dark:border-zinc-800 px-4 md:px-6 flex items-center justify-between">
+      <header className="fixed top-0 left-0 right-0 z-50 h-12 border-b border-zinc-100 dark:border-zinc-800 bg-background px-4 md:px-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Link href="/dashboard/organizations" className="flex items-center gap-3">
             <Logo variant="mark" className="h-4"/>
           </Link>
+          <BreadcrumbSeparator> / </BreadcrumbSeparator>
           <Breadcrumb className="sm:flex md:flex">
             <BreadcrumbList>
               {orgSlug && (
                 <React.Fragment>
-                  <BreadcrumbSeparator> / </BreadcrumbSeparator>
                   <BreadcrumbItem>
                     <Select
                       value={currentOrg?.slug || "all"}
@@ -470,7 +470,7 @@ function LayoutContent({ user, avatar, name, children }: LayoutContentProps) {
         </div>
       </header>
 
-      <main className="p-4 md:p-8">
+      <main className="p-4 md:p-8 pt-16">
         {children}
       </main>
     </div>
