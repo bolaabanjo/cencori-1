@@ -93,6 +93,20 @@ type UserType = {
   user_metadata?: Record<string, unknown>;
 };
 
+interface Organization {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+interface Project {
+  id: string;
+  name: string;
+  slug: string;
+  organization_id: string;
+  orgSlug?: string; // Optional, as it's added later
+}
+
 interface LayoutContentProps {
   user: UserType;
   avatar: string | null;
@@ -104,8 +118,8 @@ function LayoutContent({ user, avatar, name, children }: LayoutContentProps) {
   const router = useRouter();
   const pathname = usePathname();
 
-  const [organizations, setOrganizations] = useState<any[]>([]);
-  const [projects, setProjects] = useState<any[]>([]);
+  const [organizations, setOrganizations] = useState<Organization[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [loadingOrgData, setLoadingOrgData] = useState(true);
 
   const supabase = createBrowserClient(
@@ -201,7 +215,7 @@ function LayoutContent({ user, avatar, name, children }: LayoutContentProps) {
                       }}
                     >
                         <SelectPrimitive.Trigger
-                          className="flex h-8 cursor-pointer w-full items-center justify-between p-1.5 text-foreground focus-visible:bg-accent focus-visible:ring-0 [&>span]:line-clamp-none"
+                          className="flex h-8 cursor-pointer w-full items-center justify-between p-1.5 text-foreground"
                         >
                           <SelectValue placeholder="Organizations">
                             {currentOrg?.name || "Organizations"}
