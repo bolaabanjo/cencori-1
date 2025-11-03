@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect, useState } from "react";
-import { notFound, redirect, useRouter } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import Link from "next/link";
 import {
@@ -12,24 +12,19 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  SidebarMenuBadge,
   SidebarTrigger,
   SidebarRail,
   SidebarGroup,
   SidebarGroupLabel,
-  SidebarGroupAction,
-  SidebarInput,
-  SidebarSeparator,
   SidebarFooter,
 } from "@/components/ui/sidebar";
-import { Home, Settings, Package, Users, Handshake, CreditCard } from "lucide-react";
 import { SettingsIcon } from "@/components/animate-ui/icons/settings";
-import { Layers, LayersIcon } from "@/components/animate-ui/icons/layers";
-import { Unplug, UnplugIcon } from "@/components/animate-ui/icons/unplug";
+import { LayersIcon } from "@/components/animate-ui/icons/layers";
+import { UnplugIcon } from "@/components/animate-ui/icons/unplug";
 import { ActivityIcon } from "@/components/animate-ui/icons/activity";
 import { PanelTopIcon } from "@/components/animate-ui/icons/panel-top";
 import { UserRoundIcon } from "@/components/animate-ui/icons/user-round";
-
+import { Home } from "lucide-react";
 
 interface OrganizationData {
   id: string;
@@ -45,7 +40,6 @@ export default function OrganizationLayout({
   params: { orgSlug: string };
 }) {
   const { orgSlug } = params;
-  const router = useRouter();
   const [organization, setOrganization] = useState<OrganizationData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -126,7 +120,6 @@ export default function OrganizationLayout({
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-              
               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip="Billing">
                   <Link href={`/dashboard/organizations/${orgSlug}/billing`}>
@@ -168,7 +161,7 @@ export default function OrganizationLayout({
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
-            </SidebarGroup>
+          </SidebarGroup>
         </SidebarContent>
         <SidebarRail />
         <SidebarFooter>
@@ -176,7 +169,6 @@ export default function OrganizationLayout({
         </SidebarFooter>
       </Sidebar>
       <main className="flex w-full flex-1 flex-col overflow-hidden">
-        
         {children}
       </main>
     </SidebarProvider>
