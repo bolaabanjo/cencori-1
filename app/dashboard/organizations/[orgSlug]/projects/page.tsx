@@ -169,7 +169,7 @@ export default function OrgProjectsPage({ params }: { params: { orgSlug: string 
             placeholder="Search projects..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-64 sm:w-full"
+            className="w-64 sm:w-20"
           />
           <Button asChild>
             <Link href={`/dashboard/organizations/${orgSlug}/projects/new`}>
