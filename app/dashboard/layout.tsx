@@ -213,7 +213,7 @@ function DesktopLayoutContent({ user, avatar, name, children }: LayoutContentPro
           <Link href="/dashboard/organizations" className="flex items-center gap-3">
             <Logo variant="mark" className="h-4"/>
           </Link>
-          <BreadcrumbSeparator> / </BreadcrumbSeparator>
+          <BreadcrumbSeparator className="text-muted-foreground"> / </BreadcrumbSeparator>
           <Breadcrumb className="sm:flex md:flex">
             <BreadcrumbList>
               {orgSlug && (
@@ -279,7 +279,7 @@ function DesktopLayoutContent({ user, avatar, name, children }: LayoutContentPro
 
               {orgSlug && projectSlug && !pathname.includes("new") && !pathname.includes("edit") && (
                 <React.Fragment>
-                  <BreadcrumbSeparator> / </BreadcrumbSeparator>
+                  <BreadcrumbSeparator className="text-muted-foreground"> / </BreadcrumbSeparator>
                   <BreadcrumbItem>
                     {projectSlug || !pathname.includes("new") || !pathname.includes("edit") ? (
                       <Select
@@ -350,7 +350,7 @@ function DesktopLayoutContent({ user, avatar, name, children }: LayoutContentPro
 
               {pathname.includes("/organizations/new") && (
                 <React.Fragment>
-                  <BreadcrumbSeparator> / </BreadcrumbSeparator>
+                  <BreadcrumbSeparator className="text-muted-foreground"> / </BreadcrumbSeparator>
                   <BreadcrumbItem>
                     <BreadcrumbPage>New Organization</BreadcrumbPage>
                   </BreadcrumbItem>
@@ -359,7 +359,7 @@ function DesktopLayoutContent({ user, avatar, name, children }: LayoutContentPro
 
               {orgSlug && pathname.includes("/projects/new") && (
                 <React.Fragment>
-                  <BreadcrumbSeparator> / </BreadcrumbSeparator>
+                  <BreadcrumbSeparator className="text-muted-foreground"> / </BreadcrumbSeparator>
                   <BreadcrumbItem>
                     <BreadcrumbPage>New Project</BreadcrumbPage>
                   </BreadcrumbItem>
@@ -368,7 +368,7 @@ function DesktopLayoutContent({ user, avatar, name, children }: LayoutContentPro
 
               {orgSlug && projectSlug && pathname.includes("/edit") && (
                 <React.Fragment>
-                  <BreadcrumbSeparator> / </BreadcrumbSeparator>
+                  <BreadcrumbSeparator className="text-muted-foreground"> / </BreadcrumbSeparator>
                   <BreadcrumbItem>
                     <BreadcrumbPage>Edit Project</BreadcrumbPage>
                   </BreadcrumbItem>
