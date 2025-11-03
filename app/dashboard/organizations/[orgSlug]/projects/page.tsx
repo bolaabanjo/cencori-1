@@ -169,7 +169,7 @@ export default function OrgProjectsPage({ params }: { params: { orgSlug: string 
             placeholder="Search projects..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-64"
+            className="w-64 sm:w-full"
           />
           <Button asChild>
             <Link href={`/dashboard/organizations/${orgSlug}/projects/new`}>
@@ -211,7 +211,11 @@ export default function OrgProjectsPage({ params }: { params: { orgSlug: string 
                 <TableCell>{new Date(project.created_at).toLocaleDateString()}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex items-center justify-end space-x-2">
-                    <Badge variant={project.status === 'active' ? 'default' : 'destructive'}>
+                    <Badge variant={'outline'} className="gap-1.5 flex items-center">
+                      <span
+                        className={`size-1.5 rounded-full ${project.status === 'active' ? 'bg-emerald-500' : 'bg-red-500'}`}
+                        aria-hidden="true"
+                      ></span>
                       {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
                     </Badge>
                   </div>

@@ -317,7 +317,7 @@ function LayoutContent({ user, avatar, name, children }: LayoutContentProps) {
                           <SelectSeparator />
                           <Link href={`/dashboard/organizations/${orgSlug}/projects/new`} className="flex items-center gap-2 cursor-pointer px-2 py-1.5 text-sm outline-hidden select-none focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50">
                               <PlusCircle className="h-4 w-4" />
-                              Create New Project
+                              New Project
                             </Link>
                         </SelectContent>
                       </Select>
