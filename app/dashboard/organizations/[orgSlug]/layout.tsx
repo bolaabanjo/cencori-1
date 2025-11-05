@@ -59,7 +59,6 @@ export default function OrganizationLayout({
           .from("organizations")
           .select("id, name, slug")
           .eq("slug", orgSlug)
-          .eq("owner_id", user.id)
           .single();
 
         if (orgError || !orgData) {
@@ -78,7 +77,7 @@ export default function OrganizationLayout({
     };
 
     fetchOrganization();
-  }, [orgSlug, router]);
+  }, [orgSlug, router, supabase]);
 
 
   if (loading) {
@@ -120,14 +119,6 @@ export default function OrganizationLayout({
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Settings">
-                  <Link href={`/dashboard/organizations/${orgSlug}/settings`}>
-                    <SettingsIcon animateOnHover/>
-                    <span>Settings</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip="Billing">
                   <Link href={`/dashboard/organizations/${orgSlug}/billing`}>
                     <PanelTopIcon animateOnHover/>
@@ -156,6 +147,14 @@ export default function OrganizationLayout({
                   <Link href={`/dashboard/organizations/${orgSlug}/teams`}>
                     <UserRoundIcon animateOnHover/>
                     <span>Teams</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip="Settings">
+                  <Link href={`/dashboard/organizations/${orgSlug}/settings`}>
+                    <SettingsIcon animateOnHover/>
+                    <span>Settings</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

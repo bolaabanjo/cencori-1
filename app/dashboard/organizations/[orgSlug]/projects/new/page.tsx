@@ -182,7 +182,7 @@ export default function NewProjectPage({ params }: { params: { orgSlug: string }
   }
 
   return (
-    <div className="flex items-center justify-center pt-10">
+    <div className="flex items-center justify-center pt-24">
       <Card className="w-[550px]">
         <CardHeader>
           <CardTitle>Create New Project</CardTitle>
@@ -208,18 +208,6 @@ export default function NewProjectPage({ params }: { params: { orgSlug: string }
                 placeholder="A brief description of my project"
                 {...form.register("description")}
               />
-            </div>
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="visibility">Visibility</Label>
-              <Select onValueChange={(value) => form.setValue("visibility", value as "private" | "public")} defaultValue="private">
-                <SelectTrigger id="visibility" className="w-full">
-                  <SelectValue placeholder="Select a visibility" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="private">Private</SelectItem>
-                  <SelectItem value="public">Public</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
             <div className="flex flex-col space-y-1.5">
               <Label htmlFor="github_repo_url">GitHub Repository URL (Optional)</Label>

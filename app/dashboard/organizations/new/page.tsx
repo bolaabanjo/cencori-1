@@ -90,12 +90,25 @@ export default function NewOrganizationPage() {
       return;
     }
 
+    // Fetch the plan_id based on the selected plan name
+    const { data: planData, error: planError } = await supabase
+      .from("organization_plans")
+      .select("id")
+      .eq("name", values.plan)
+      .single();
+
+    if (planError || !planData) {
+      console.error("Error fetching plan ID:", planError?.message);
+      toast.error("Failed to determine organization plan. Please try again.");
+      setLoading(false);
+      return;
+    }
+
     const { data: orgData, error } = await supabase.from("organizations").insert({
       name: values.name,
       slug: newSlug,
       description: values.description,
-      type: values.type,
-      current_plan: values.plan,
+      plan_id: planData.id,
       owner_id: user.id,
     }).select('id').single(); // Select the id of the newly created organization
 

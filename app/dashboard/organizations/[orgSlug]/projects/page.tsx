@@ -4,13 +4,14 @@ import { supabase as browserSupabase } from "@/lib/supabaseClient"; // Use brows
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { notFound, redirect, useRouter } from "next/navigation"; // Import useRouter
+import { notFound, useRouter } from "next/navigation"; // Import useRouter
 import { Home as HomeIcon } from "lucide-react";
 import { useEffect, useState } from "react"; // Import useState
 import { PlusIcon } from '@/components/ui/plus';
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge"; // Import Badge component
 import { Input } from "@/components/ui/input"; // Import Input component
+import { Search } from "lucide-react"; // Import Search icon
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,7 +27,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog"; // Import Dialog components
 import { toast } from "sonner";
 
@@ -66,7 +66,7 @@ export default function OrgProjectsPage({ params }: { params: { orgSlug: string 
         const { data: { user }, error: userError } = await browserSupabase.auth.getUser();
 
         if (userError || !user) {
-          redirect("/login");
+          router.push("/login");
           return;
         }
 
@@ -74,7 +74,6 @@ export default function OrgProjectsPage({ params }: { params: { orgSlug: string 
           .from("organizations")
           .select("id, name, slug")
           .eq("slug", orgSlug)
-          .eq("owner_id", user.id)
           .single();
 
         if (orgError || !orgData) {
@@ -159,34 +158,35 @@ export default function OrgProjectsPage({ params }: { params: { orgSlug: string 
   }
 
   return (
-    <div className="container mx-auto py-8">
-        <div className="flex items-center space-x-4 pb-4">
+    <div className="mx-92 py-24">
+        <div className="flex items-center space-x-4 pb-12">
         <h1 className="text-xl font-bold">Projects</h1>
         </div>
-      <div>
       <div className="flex justify-between items-center mb-6">
+        <div className="relative">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             type="text"
             placeholder="Search projects..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full mr-6"
+            className="max-w-xs pl-8"
           />
+        </div>
           <Button asChild>
             <Link href={`/dashboard/organizations/${orgSlug}/projects/new`}>
               <PlusIcon size={16} className="mr-2" />
-                New Project
+              New Project
             </Link>
           </Button>
       </div>
-      </div>
+
       {/* Filter projects based on search term */}
       {projects && projects.length > 0 ? (
         <Table>
-          <TableHeader className=" bg-muted/50">
-            <TableRow className=" bg-muted/50">
+          <TableHeader className="bg-muted/50">
+            <TableRow className="bg-muted/50">
               <TableHead>PROJECT</TableHead>
-              <TableHead>VISIBILITY</TableHead>
               <TableHead>DATE CREATED</TableHead>
               <TableHead className="text-right">STATUS</TableHead>
               <TableHead className="text-right"></TableHead>
@@ -202,11 +202,6 @@ export default function OrgProjectsPage({ params }: { params: { orgSlug: string 
                 <TableCell className="font-medium">
                   {project.name}
                   <p className="text-muted-foreground text-xs">ID: {project.slug}</p>
-                </TableCell>
-                <TableCell>
-                  <Badge variant={project.visibility === 'public' ? 'secondary' : 'default'}>
-                    {project.visibility.charAt(0).toUpperCase() + project.visibility.slice(1)}
-                  </Badge>
                 </TableCell>
                 <TableCell>
                   {(() => {

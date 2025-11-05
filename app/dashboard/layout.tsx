@@ -7,10 +7,8 @@ import { supabase } from "@/lib/supabaseClient";
 import { Logo } from "@/components/logo";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
-import { Separator } from "@/components/ui/separator";
-import { LogOut, CircleUserRound, CreditCard, Settings, Home, Users, UserPlus } from "lucide-react";
+import { CircleUserRound, CreditCard, Settings, Users, UserPlus } from "lucide-react";
 import Link from "next/link";
-// import { BreadcrumbProvider, useBreadcrumbs } from "@/lib/contexts/BreadcrumbContext";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -18,7 +16,6 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-  BreadcrumbEllipsis,
 } from "@/components/ui/breadcrumb";
 import { Input } from "@/components/ui/input";
 import {
@@ -26,7 +23,6 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectSeparator,
   SelectValue,
   SelectPrimitive,
@@ -34,15 +30,12 @@ import {
 import { ChevronsUpDown, PlusCircle, Search } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr"; // Import createBrowserClient
-import { useIsMobile } from "@/hooks/use-mobile";
-import MobileLayout from "./organizations/[orgSlug]/mobile-layout";
 
 // Optional header/nav links later
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<unknown | null>(null);
-  const isMobile = useIsMobile();
 
   useEffect(() => {
     let mounted = true;
@@ -62,7 +55,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     return () => {
       mounted = false;
     };
-  }, [router]);
+  }, [router, supabase]);
 
   // while checking auth, render nothing or a simple skeleton to avoid flash
   if (loading) return null;
@@ -81,25 +74,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     typedUser.email?.split?.("@")[0] ??
     null;
 
-  if (isMobile) {
-    return (
-      <MobileLayout
-        user={typedUser}
-        avatar={avatar}
-        name={name}
-      >
-        {children}
-      </MobileLayout>
-    );
-  }
-
   return (
-    <DesktopLayoutContent
+    <LayoutContent
       user={typedUser}
       avatar={avatar}
       name={name}>
       {children}
-    </DesktopLayoutContent>
+    </LayoutContent>
   );
 }
 
@@ -129,7 +110,7 @@ interface LayoutContentProps {
   children: React.ReactNode;
 }
 
-function DesktopLayoutContent({ user, avatar, name, children }: LayoutContentProps) {
+function LayoutContent({ user, avatar, name, children }: LayoutContentProps) {
   const router = useRouter();
   const pathname = usePathname();
 
@@ -156,8 +137,7 @@ function DesktopLayoutContent({ user, avatar, name, children }: LayoutContentPro
       // Fetch organizations
       const { data: orgsData, error: orgsError } = await supabase
         .from("organizations")
-        .select("id, name, slug")
-        .eq("owner_id", currentUser.id);
+        .select("id, name, slug");
 
       if (orgsError) {
         console.error("Error fetching organizations:", orgsError.message);
@@ -188,7 +168,7 @@ function DesktopLayoutContent({ user, avatar, name, children }: LayoutContentPro
     };
 
     fetchOrgAndProjects();
-  }, [user]); // Re-fetch if the authenticated user changes
+  }, [user, supabase]); // Re-fetch if the authenticated user changes
 
   const getOrgSlug = () => {
     const match = pathname.match(/organizations\/([^/]+)/);
@@ -277,11 +257,11 @@ function DesktopLayoutContent({ user, avatar, name, children }: LayoutContentPro
                 </React.Fragment>
               )}
 
-              {orgSlug && projectSlug && !pathname.includes("new") && !pathname.includes("edit") && (
+              {orgSlug && projectSlug && (
                 <React.Fragment>
                   <BreadcrumbSeparator className="text-muted-foreground"> / </BreadcrumbSeparator>
                   <BreadcrumbItem>
-                    {projectSlug || !pathname.includes("new") || !pathname.includes("edit") ? (
+                    {projectSlug ? (
                       <Select
                         value={currentProject?.slug || "all"}
                         onValueChange={(slug) => {
@@ -333,7 +313,7 @@ function DesktopLayoutContent({ user, avatar, name, children }: LayoutContentPro
                           <Link href={`/dashboard/organizations/${orgSlug}/projects/new`} className="flex items-center gap-2 cursor-pointer px-2 py-1.5 text-sm outline-hidden select-none focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50">
                               <PlusCircle className="h-4 w-4" />
                               New Project
-                            </Link>
+                    </Link>
                         </SelectContent>
                       </Select>
                     ) : (
@@ -373,7 +353,7 @@ function DesktopLayoutContent({ user, avatar, name, children }: LayoutContentPro
                     <BreadcrumbPage>Edit Project</BreadcrumbPage>
                   </BreadcrumbItem>
                 </React.Fragment>
-              )}
+          )}
             </BreadcrumbList>
           </Breadcrumb>
         </div>

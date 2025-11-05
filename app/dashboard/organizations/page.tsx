@@ -10,14 +10,15 @@ import { useEffect, useState } from "react";
 import { PlusIcon } from "@/components/ui/plus";
 import { BoxesIcon } from "@/components/ui/boxes"; // Import BoxesIcon
 import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react"; // Import Search icon
 
 interface OrganizationData {
   id: string;
   name: string;
   slug: string;
   description?: string;
-  type: string;
-  current_plan: string;
+  plan_id: string;
+  organization_plans: { name: string }[]; // Corrected to array type
 }
 
 export default function OrganizationsPage() {
@@ -47,8 +48,7 @@ export default function OrganizationsPage() {
 
         const { data: orgsData, error: fetchError } = await supabase
           .from("organizations")
-          .select("id, name, slug, description, type, current_plan")
-          .eq("owner_id", user.id);
+          .select("id, name, slug, description, plan_id, organization_plans(name)");
 
         if (fetchError) {
           console.error("Error fetching organizations:", fetchError.message);
@@ -104,18 +104,21 @@ export default function OrganizationsPage() {
   );
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="flex items-center space-x-4 pb-4">
+    <div className="mx-92 py-16">
+      <div className="flex items-center space-x-4 pb-12">
         <h1 className="text-lg font-bold">Your Organizations</h1>
       </div>
       <div className="flex justify-between items-center mb-6">
-        <Input
-          type="text"
-          placeholder="Search organizations..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="max-w-xs mr-6"
-        />
+        <div className="relative">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Search organizations..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="max-w-xs mr-6 pl-8"
+          />
+        </div>
         <Button asChild>
           <Link href="/dashboard/organizations/new">
             <PlusIcon size={16} className="mr-2" />
@@ -133,7 +136,7 @@ export default function OrganizationsPage() {
               </div>
               <div className="flex-col">
                 <CardTitle className="font-bold">{org.name}</CardTitle>
-                  <p className="text-muted-foreground">{org.current_plan.charAt(0).toUpperCase() + org.current_plan.slice(1) + " Plan"}</p>
+                  <p className="text-muted-foreground">{org.organization_plans[0]?.name?.charAt(0).toUpperCase() + org.organization_plans[0]?.name?.slice(1) + " Plan"}</p>
               </div>
             </CardHeader>
           </Card>
