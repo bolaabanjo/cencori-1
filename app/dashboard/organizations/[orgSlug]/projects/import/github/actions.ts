@@ -16,7 +16,7 @@ export async function importGitHubProject({ orgSlug, organizationId, repoId, rep
   'use server';
 
   console.log('Server Action: importGitHubProject called.');
-  const supabase = createServerClient();
+  const supabase = await createServerClient();
 
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   console.log('User data:', user);
