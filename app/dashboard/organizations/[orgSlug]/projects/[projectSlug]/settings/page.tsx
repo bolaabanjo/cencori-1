@@ -213,7 +213,7 @@ export default function ProjectSettingsPage() {
       <Card >
         <CardHeader>
           <CardTitle>Project Details</CardTitle>
-          <CardDescription>View and manage your project's basic information.</CardDescription>
+          <CardDescription>View and manage your project&apos;s basic information.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-2">
