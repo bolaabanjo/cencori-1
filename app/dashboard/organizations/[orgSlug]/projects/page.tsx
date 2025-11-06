@@ -61,7 +61,7 @@ export default function OrgProjectsPage({
     (async () => {
       try {
         const resolved = await Promise.resolve(params);
-        if (mounted && resolved && typeof (resolved as any).orgSlug === "string") {
+        if (mounted && resolved && typeof (resolved as { orgSlug: string }).orgSlug === "string") {
           setOrgSlug((resolved as { orgSlug: string }).orgSlug);
         }
       } catch (e) {
