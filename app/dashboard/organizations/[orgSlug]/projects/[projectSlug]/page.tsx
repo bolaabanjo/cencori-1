@@ -1,12 +1,12 @@
 "use client";
 
-import { supabase as browserSupabase } from "@/lib/supabaseClient"; // Use browser client
-import { notFound, redirect } from "next/navigation";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { supabase as browserSupabase } from "@/lib/supabaseClient";
+import { notFound } from "next/navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { Home as HomeIcon } from "lucide-react";
-import { useEffect, useState } from "react";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface OrganizationData {
   id: string;
@@ -24,16 +24,40 @@ interface ProjectData {
 
 export default function ProjectDetailsPage({
   params,
-}: { 
-  params: { orgSlug: string; projectSlug: string };
+}: {
+  params: { orgSlug: string; projectSlug: string } | Promise<{ orgSlug: string; projectSlug: string }>;
 }) {
-  const { orgSlug, projectSlug } = params;
+  // Resolve params safely for client component
+  const [orgSlug, setOrgSlug] = useState<string | null>(null);
+  const [projectSlug, setProjectSlug] = useState<string | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const resolved = await Promise.resolve(params as { orgSlug: string; projectSlug: string } | Promise<{ orgSlug: string; projectSlug: string }>);
+        if (mounted && resolved) {
+          if (typeof resolved.orgSlug === "string") setOrgSlug(resolved.orgSlug);
+          if (typeof resolved.projectSlug === "string") setProjectSlug(resolved.projectSlug);
+        }
+      } catch (e) {
+        console.error("Failed to resolve params:", e);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [params]);
+
+  const router = useRouter();
   const [organization, setOrganization] = useState<OrganizationData | null>(null);
   const [project, setProject] = useState<ProjectData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!orgSlug || !projectSlug) return;
+
     const fetchProjectDetails = async () => {
       setLoading(true);
       setError(null);
@@ -41,11 +65,10 @@ export default function ProjectDetailsPage({
         const { data: { user }, error: userError } = await browserSupabase.auth.getUser();
 
         if (userError || !user) {
-          redirect("/login");
+          router.push("/login");
           return;
         }
 
-        // Fetch organization to ensure the user has access and get organization_id
         const { data: orgData, error: orgError } = await browserSupabase
           .from("organizations")
           .select("id, name, slug")
@@ -60,7 +83,6 @@ export default function ProjectDetailsPage({
         }
         setOrganization(orgData);
 
-        // Fetch project details
         const { data: projectData, error: projectError } = await browserSupabase
           .from("projects")
           .select("id, name, slug, description, created_at")
@@ -74,16 +96,7 @@ export default function ProjectDetailsPage({
           return;
         }
         setProject(projectData);
-
-        // Set breadcrumbs
-        // setBreadcrumbs([
-        //   { label: "Organizations", href: "/dashboard/organizations" },
-        //   { label: orgData.name, href: `/dashboard/organizations/${orgSlug}/projects` },
-        //   { label: "Projects", href: `/dashboard/organizations/${orgSlug}/projects` },
-        //   { label: projectData.name },
-        // ]);
-
-      } catch (err: unknown) { // Change any to unknown
+      } catch (err: unknown) {
         console.error("Unexpected error:", (err as Error).message);
         setError("An unexpected error occurred.");
       } finally {
@@ -92,7 +105,7 @@ export default function ProjectDetailsPage({
     };
 
     fetchProjectDetails();
-  }, [orgSlug, projectSlug]);
+  }, [orgSlug, projectSlug, router]);
 
   if (loading) {
     return (
@@ -111,7 +124,6 @@ export default function ProjectDetailsPage({
   }
 
   if (!organization || !project) {
-    // Should theoretically be caught by notFound() above, but as a safeguard
     return (
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-theme(spacing.16))]">
         <p className="text-sm text-red-500">Project or Organization not found.</p>
@@ -128,14 +140,12 @@ export default function ProjectDetailsPage({
       <Card>
         <CardHeader>
           <CardTitle>Project Details</CardTitle>
-          <CardDescription>Information about this project.</CardDescription>
         </CardHeader>
         <CardContent>
           <p><strong>Organization:</strong> {organization.name}</p>
           <p><strong>Project ID:</strong> {project.slug}</p>
           <p><strong>Description:</strong> {project.description || "No description provided."}</p>
           <p><strong>Created At:</strong> {new Date(project.created_at).toLocaleDateString()}</p>
-          {/* Add more project details as needed */}
         </CardContent>
       </Card>
     </div>

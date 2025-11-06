@@ -3,7 +3,7 @@
 
 import { createBrowserClient } from "@supabase/ssr";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react"; // Import useEffect and useState
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -38,27 +38,47 @@ interface OrganizationData {
 const formSchema = z.object({
   name: z.string().min(2, { message: "Project name must be at least 2 characters." }),
   description: z.string().optional(),
-  visibility: z.enum(["private", "public"]), // Make it non-optional here, with default in `useForm`
+  visibility: z.enum(["private", "public"]),
   github_repo_url: z.string().url("Must be a valid URL").optional().or(z.literal("")),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
-export default function NewProjectPage({ params }: { params: { orgSlug: string } }) {
-  const { orgSlug } = params;
+export default function NewProjectPage({ params }: { params: { orgSlug: string } | Promise<{ orgSlug: string }> }) {
+  // Resolve params safely (works whether params is an object or a Promise)
+  const [orgSlug, setOrgSlug] = useState<string | null>(null);
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const resolved = await Promise.resolve(params);
+        if (mounted && resolved && typeof (resolved as any).orgSlug === "string") {
+          setOrgSlug((resolved as { orgSlug: string }).orgSlug);
+        }
+      } catch (err) {
+        console.error("Failed to resolve params:", err);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [params]);
+
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [orgLoading, setOrgLoading] = useState(true); // New loading state for organization
-  const [orgError, setOrgError] = useState<string | null>(null); // New error state for organization
-  const [organization, setOrganization] = useState<OrganizationData | null>(null); // New state for organization
+  const [orgLoading, setOrgLoading] = useState(true);
+  const [orgError, setOrgError] = useState<string | null>(null);
+  const [organization, setOrganization] = useState<OrganizationData | null>(null);
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!,
   );
 
-  // Fetch organization details in useEffect
+  // Fetch organization details once orgSlug is available
   useEffect(() => {
+    if (!orgSlug) return;
+
     const fetchOrg = async () => {
       setOrgLoading(true);
       setOrgError(null);
@@ -83,8 +103,7 @@ export default function NewProjectPage({ params }: { params: { orgSlug: string }
           return;
         }
         setOrganization(orgData);
-
-      } catch (err: unknown) { // Change any to unknown
+      } catch (err: unknown) {
         console.error("Unexpected error fetching organization:", (err as Error).message);
         setOrgError("An unexpected error occurred while loading organization details.");
       } finally {
@@ -100,13 +119,14 @@ export default function NewProjectPage({ params }: { params: { orgSlug: string }
     defaultValues: {
       name: "",
       description: "",
-      visibility: "private", // Explicitly set default here
+      visibility: "private",
       github_repo_url: "",
     },
   });
 
   const onSubmit = async (values: FormValues) => {
     setLoading(true);
+
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -124,8 +144,7 @@ export default function NewProjectPage({ params }: { params: { orgSlug: string }
     let newSlug = generateSlug();
     let slugExists = true;
 
-    // Ensure project slug is unique within this organization
-    for (let i = 0; i < 5; i++) { // Max 5 retries
+    for (let i = 0; i < 5; i++) {
       const { data, error } = await supabase
         .from("projects")
         .select("slug")
@@ -151,8 +170,8 @@ export default function NewProjectPage({ params }: { params: { orgSlug: string }
       slug: newSlug,
       description: values.description,
       organization_id: organization.id,
-      visibility: values.visibility, // Insert new field
-      github_repo_url: values.github_repo_url || null, // Insert new field, handle empty string
+      visibility: values.visibility,
+      github_repo_url: values.github_repo_url || null,
     });
 
     if (error) {
@@ -165,7 +184,7 @@ export default function NewProjectPage({ params }: { params: { orgSlug: string }
     setLoading(false);
   };
 
-  if (orgLoading) {
+  if (!orgSlug || orgLoading) {
     return (
       <div className="flex items-center justify-center min-h-[calc(100vh-theme(spacing.16))]">
         <p className="text-xl">Loading organization details...</p>
@@ -192,45 +211,35 @@ export default function NewProjectPage({ params }: { params: { orgSlug: string }
           <form onSubmit={form.handleSubmit(onSubmit)} className="grid w-full items-center gap-4">
             <div className="flex flex-col space-y-1.5">
               <Label htmlFor="name">Project Name</Label>
-              <Input
-                id="name"
-                placeholder="My Awesome Project"
-                {...form.register("name")}
-              />
+              <Input id="name" placeholder="My Awesome Project" {...form.register("name")} />
               {form.formState.errors.name && (
                 <p className="text-red-500 text-sm">{form.formState.errors.name.message}</p>
               )}
             </div>
+
             <div className="flex flex-col space-y-1.5">
               <Label htmlFor="description">Description (Optional)</Label>
-              <Input
-                id="description"
-                placeholder="A brief description of my project"
-                {...form.register("description")}
-              />
+              <Input id="description" placeholder="A brief description of my project" {...form.register("description")} />
             </div>
+
             <div className="flex flex-col space-y-1.5">
               <Label htmlFor="github_repo_url">GitHub Repository URL (Optional)</Label>
-              <Input
-                id="github_repo_url"
-                placeholder="https://github.com/your-repo"
-                {...form.register("github_repo_url")}
-              />
+              <Input id="github_repo_url" placeholder="https://github.com/your-repo" {...form.register("github_repo_url")} />
               {form.formState.errors.github_repo_url && (
                 <p className="text-red-500 text-sm">{form.formState.errors.github_repo_url.message}</p>
               )}
             </div>
+
             <Button type="submit" disabled={loading}>
               {loading ? "Creating..." : "Create Project"}
             </Button>
+
             <Button type="button" variant="outline" asChild>
               <Link href={`/dashboard/organizations/${orgSlug}/projects`}>Cancel</Link>
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="text-sm text-muted-foreground">
-          Projects are contained within organizations.
-        </CardFooter>
+        <CardFooter className="text-sm text-muted-foreground">Projects are contained within organizations.</CardFooter>
       </Card>
     </div>
   );

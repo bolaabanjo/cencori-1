@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React, { useEffect, useState } from "react";
 import { notFound, useRouter } from "next/navigation";
@@ -14,7 +14,6 @@ import {
   SidebarTrigger,
   SidebarRail,
   SidebarGroup,
-  SidebarGroupLabel,
 } from "@/components/ui/sidebar";
 import { LayersIcon } from "@/components/animate-ui/icons/layers";
 import { SettingsIcon } from "@/components/animate-ui/icons/settings";
@@ -23,21 +22,21 @@ import { ActivityIcon } from "@/components/animate-ui/icons/activity";
 import { UnplugIcon } from "@/components/animate-ui/icons/unplug";
 import { UserRoundIcon } from "@/components/animate-ui/icons/user-round";
 
-
 interface OrganizationData {
   id: string;
   name: string;
   slug: string;
 }
 
+type LayoutParams = { orgSlug: string } | Promise<{ orgSlug: string }>;
+
 export default function OrganizationLayout({
   children,
   params,
 }: {
   children: React.ReactNode;
-  params: { orgSlug: string };
+  params: LayoutParams;
 }) {
-  const { orgSlug } = params;
   const router = useRouter();
   const [organization, setOrganization] = useState<OrganizationData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -48,7 +47,13 @@ export default function OrganizationLayout({
       setLoading(true);
       setError(null);
       try {
-        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        const resolvedParams = await Promise.resolve(params);
+        const { orgSlug } = resolvedParams;
+
+        const {
+          data: { user },
+          error: userError,
+        } = await supabase.auth.getUser();
 
         if (userError || !user) {
           router.push("/login");
@@ -66,8 +71,8 @@ export default function OrganizationLayout({
           notFound();
           return;
         }
-        setOrganization(orgData);
 
+        setOrganization(orgData);
       } catch (err: unknown) {
         console.error("Unexpected error:", (err as Error).message);
         setError("An unexpected error occurred.");
@@ -77,83 +82,79 @@ export default function OrganizationLayout({
     };
 
     fetchOrganization();
-  }, [orgSlug, router, supabase]);
+  }, [params, router]);
 
-
-  if (loading) {
+  if (loading)
     return (
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-theme(spacing.16))]">
         <p className="text-sm text-muted-foreground">Loading organization...</p>
       </div>
     );
-  }
 
-  if (error) {
+  if (error)
     return (
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-theme(spacing.16))]">
         <p className="text-sm text-red-500">{error}</p>
       </div>
     );
-  }
 
-  if (!organization) {
+  if (!organization)
     return (
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-theme(spacing.16))]">
         <p className="text-sm text-red-500">Organization not found.</p>
       </div>
     );
-  }
 
   return (
-    <SidebarProvider defaultOpen={true}>
-      <Sidebar collapsible="icon" className="top-12 h-[calc(100vh-3rem)] ">
+    <SidebarProvider defaultOpen>
+      <Sidebar collapsible="icon" className="top-12 h-[calc(100vh-3rem)]">
         <SidebarContent>
           <SidebarGroup className="pt-4">
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip="Projects">
-                  <Link href={`/dashboard/organizations/${orgSlug}/projects`}>
-                    <LayersIcon animateOnHover/>
+                  <Link href={`/dashboard/organizations/${organization.slug}/projects`}>
+                    <LayersIcon animateOnHover />
                     <span>Projects</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip="Billing">
-                  <Link href={`/dashboard/organizations/${orgSlug}/billing`}>
-                    <PanelTopIcon animateOnHover/>
+                  <Link href={`/dashboard/organizations/${organization.slug}/billing`}>
+                    <PanelTopIcon animateOnHover />
                     <span>Billing</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip="Usage">
-                  <Link href={`/dashboard/organizations/${orgSlug}/usage`}>
-                    <ActivityIcon animateOnHover/>
+                  <Link href={`/dashboard/organizations/${organization.slug}/usage`}>
+                    <ActivityIcon animateOnHover />
                     <span>Usage</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip="Integrations">
-                  <Link href={`/dashboard/organizations/${orgSlug}/integrations`}>
-                    <UnplugIcon animateOnHover/>
+                  <Link href={`/dashboard/organizations/${organization.slug}/integrations`}>
+                    <UnplugIcon animateOnHover />
                     <span>Integrations</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip="Teams">
-                  <Link href={`/dashboard/organizations/${orgSlug}/teams`}>
-                    <UserRoundIcon animateOnHover/>
+                  <Link href={`/dashboard/organizations/${organization.slug}/teams`}>
+                    <UserRoundIcon animateOnHover />
                     <span>Teams</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip="Settings">
-                  <Link href={`/dashboard/organizations/${orgSlug}/settings`}>
-                    <SettingsIcon animateOnHover/>
+                  <Link href={`/dashboard/organizations/${organization.slug}/settings`}>
+                    <SettingsIcon animateOnHover />
                     <span>Settings</span>
                   </Link>
                 </SidebarMenuButton>
@@ -166,9 +167,7 @@ export default function OrganizationLayout({
           <SidebarTrigger />
         </div>
       </Sidebar>
-      <main className="flex w-full flex-1 flex-col overflow-hidden">
-        {children}
-      </main>
+      <main className="flex w-full flex-1 flex-col overflow-hidden">{children}</main>
     </SidebarProvider>
   );
 }
