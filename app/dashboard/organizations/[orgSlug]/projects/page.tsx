@@ -175,7 +175,7 @@ export default function OrgProjectsPage({
   }
 
   return (
-    <div className="mx-92 py-24 bg-sidebar">
+    <div className="mx-92 py-24 dark:bg-sidebar">
       <div className="flex items-center space-x-4 pb-12">
         <h1 className="text-xl font-bold">Projects</h1>
       </div>
@@ -288,9 +288,14 @@ export default function OrgProjectsPage({
         <div className="text-center p-32 flex flex-col items-center justify-center">
           <FolderCog />
           <p className="text-xl mb-4 mt-4">No projects found for {organization.name}.</p>
-          <Button asChild>
-            <Link href={`/dashboard/organizations/${orgSlug}/projects/new`}>Create Project</Link>
-          </Button>
+          <div className="flex items-center space-x-2">
+            <Button asChild>
+              <Link href={`/dashboard/organizations/${orgSlug}/projects/new`}>Create Project</Link>
+            </Button>
+            <Button asChild variant="outline" className="cursor-pointer">
+              <Link href={`/dashboard/organizations/${orgSlug}/projects/import/github`}>Import Project</Link>
+            </Button>
+          </div>
         </div>
       )}
 
