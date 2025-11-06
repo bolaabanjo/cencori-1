@@ -189,15 +189,14 @@ function Sidebar({
           data-mobile="true"
           className={cn(
             "bg-sidebar text-sidebar-foreground p-0 [&>button]:hidden",
-            side === "bottom" && "h-(--sidebar-width) w-full",
-            side !== "bottom" && "w-(--sidebar-width)"
+            "w-full h-1/2" // Set width to full and height to half for bottom sheet
           )}
           style={
             {
-              "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
+              // No need for custom sidebar-width as we're using h-1/2 and w-full
             } as React.CSSProperties
           }
-          side={side}
+          side="bottom" // Always come from bottom on mobile
         >
           <SheetHeader className="sr-only">
             <SheetTitle>Sidebar</SheetTitle>
