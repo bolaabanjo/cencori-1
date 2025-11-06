@@ -90,8 +90,8 @@ export default function OrganizationsPage() {
   // This block should ideally not be reached if organizations.length is 0 due to redirect in useEffect
   if (!organizations || organizations.length === 0) {
     return (
-      <div className="text-center p-10 border rounded-lg">
-        <p className="text-sm mb-4">You don&apos;t have any organizations yet.</p>
+      <div className="text-center p-10 ">
+        <p className="text-sm mb-4 mt-32">You don&apos;t have any organizations yet.</p>
         <Button asChild>
           <Link href="/dashboard/organizations/new">Create Your First Organization</Link>
         </Button>
