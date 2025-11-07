@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
         organization_id: organizationId, // Use organization_id here
         installation_id: installation_id,
         // other relevant data like user_id, installed_at etc.
-      }, { onConflict: 'organization_id' }); // Use organization_id for conflict resolution
+      }, { onConflict: 'installation_id' }); // Use installation_id for conflict resolution
 
     if (error) {
       console.error('Error saving GitHub App installation:', error);
