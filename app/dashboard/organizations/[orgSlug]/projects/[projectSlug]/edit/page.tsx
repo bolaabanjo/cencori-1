@@ -26,6 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useOrganizationProject } from "@/lib/contexts/OrganizationProjectContext";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Project name must be at least 2 characters." }),
@@ -60,6 +61,9 @@ export default function EditProjectPage({
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!,
   );
+
+  // Get context to update breadcrumbs
+  const { updateProject: updateProjectContext } = useOrganizationProject();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -152,6 +156,10 @@ export default function EditProjectPage({
       toast.error("Failed to update project: " + updateError.message);
     } else {
       toast.success("Project updated successfully!");
+
+      // Update context for real-time breadcrumb updates
+      updateProjectContext(project.id, { name: values.name, description: values.description });
+
       router.push(`/dashboard/organizations/${orgSlug}/projects/${projectSlug}`);
     }
     setSubmitting(false);
@@ -211,7 +219,7 @@ export default function EditProjectPage({
             </div>
             <div className="flex flex-col space-y-1.5">
               <Label htmlFor="visibility">Visibility</Label>
-              <Select onValueChange={(value) => form.setValue("visibility", value as FormValues["visibility"]) } defaultValue={form.getValues("visibility")}>
+              <Select onValueChange={(value) => form.setValue("visibility", value as FormValues["visibility"])} defaultValue={form.getValues("visibility")}>
                 <SelectTrigger id="visibility">
                   <SelectValue placeholder="Select visibility" />
                 </SelectTrigger>
@@ -226,7 +234,7 @@ export default function EditProjectPage({
             </div>
             <div className="flex flex-col space-y-1.5">
               <Label htmlFor="status">Status</Label>
-              <Select onValueChange={(value) => form.setValue("status", value as FormValues["status"]) } defaultValue={form.getValues("status")}>
+              <Select onValueChange={(value) => form.setValue("status", value as FormValues["status"])} defaultValue={form.getValues("status")}>
                 <SelectTrigger id="status">
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
@@ -240,12 +248,12 @@ export default function EditProjectPage({
               )}
             </div>
             <div className="flex justify-between items-center mt-4">
-            <Button type="button" variant="outline" onClick={() => router.push(`/dashboard/organizations/${orgSlug}/projects/${projectSlug}`)}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={submitting}>
-              {submitting ? "Updating..." : "Update Project"}
-            </Button>
+              <Button type="button" variant="outline" onClick={() => router.push(`/dashboard/organizations/${orgSlug}/projects/${projectSlug}`)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={submitting}>
+                {submitting ? "Updating..." : "Update Project"}
+              </Button>
             </div>
           </form>
         </CardContent>

@@ -29,8 +29,8 @@ import {
 } from "@/components/ui/select";
 import { ChevronsUpDown, PlusCircle, Search } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { createBrowserClient } from "@supabase/ssr"; // Import createBrowserClient
 import { Toaster } from "@/components/ui/sonner";
+import { OrganizationProjectProvider, useOrganizationProject } from "@/lib/contexts/OrganizationProjectContext";
 
 // Optional header/nav links later
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -76,12 +76,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     null;
 
   return (
-    <LayoutContent
-      user={typedUser}
-      avatar={avatar}
-      name={name}>
-      {children}
-    </LayoutContent>
+    <OrganizationProjectProvider>
+      <LayoutContent
+        user={typedUser}
+        avatar={avatar}
+        name={name}>
+        {children}
+      </LayoutContent>
+    </OrganizationProjectProvider>
   );
 }
 
@@ -115,61 +117,8 @@ function LayoutContent({ user, avatar, name, children }: LayoutContentProps) {
   const router = useRouter();
   const pathname = usePathname();
 
-  const [organizations, setOrganizations] = useState<Organization[]>([]);
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [loadingOrgData, setLoadingOrgData] = useState(true);
-
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!,
-  );
-
-  useEffect(() => {
-    const fetchOrgAndProjects = async () => {
-      setLoadingOrgData(true);
-      const { data: { user: currentUser }, error: userError } = await supabase.auth.getUser();
-
-      if (userError || !currentUser) {
-        console.error("User not logged in:", userError?.message);
-        setLoadingOrgData(false);
-        return;
-      }
-
-      // Fetch organizations
-      const { data: orgsData, error: orgsError } = await supabase
-        .from("organizations")
-        .select("id, name, slug");
-
-      if (orgsError) {
-        console.error("Error fetching organizations:", orgsError.message);
-      } else {
-        setOrganizations(orgsData || []);
-      }
-
-      // Fetch projects for all fetched organizations
-      if (orgsData && orgsData.length > 0) {
-        const orgIds = orgsData.map(org => org.id);
-        const { data: projectsData, error: projectsError } = await supabase
-          .from("projects")
-          .select("id, name, slug, organization_id")
-          .in("organization_id", orgIds);
-
-        if (projectsError) {
-          console.error("Error fetching projects:", projectsError.message);
-        } else {
-          // Map project data to include orgSlug for easier filtering in breadcrumbs
-          const projectsWithOrgSlug = projectsData?.map(proj => ({
-            ...proj,
-            orgSlug: orgsData.find(org => org.id === proj.organization_id)?.slug
-          })) || [];
-          setProjects(projectsWithOrgSlug);
-        }
-      }
-      setLoadingOrgData(false);
-    };
-
-    fetchOrgAndProjects();
-  }, [user, supabase]); // Re-fetch if the authenticated user changes
+  // Use context instead of local state
+  const { organizations, projects, loading: loadingOrgData } = useOrganizationProject();
 
   const getOrgSlug = () => {
     const match = pathname.match(/organizations\/([^/]+)/);
@@ -192,7 +141,7 @@ function LayoutContent({ user, avatar, name, children }: LayoutContentProps) {
       <header className="fixed top-0 left-0 right-0 z-50 h-12 border-b border-zinc-100 dark:border-zinc-800 bg-sidebar px-4 md:px-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Link href="/dashboard/organizations" className="flex items-center gap-3">
-            <Logo variant="mark" className="h-4"/>
+            <Logo variant="mark" className="h-4" />
           </Link>
           <BreadcrumbSeparator className="text-muted-foreground"> / </BreadcrumbSeparator>
           <Breadcrumb className="sm:flex md:flex">
@@ -210,50 +159,50 @@ function LayoutContent({ user, avatar, name, children }: LayoutContentProps) {
                         }
                       }}
                     >
-                        <SelectPrimitive.Trigger
-                          className="flex h-8 cursor-pointer w-full items-center justify-between p-1.5 text-foreground"
-                        >
-                          <SelectValue placeholder="Organizations">
-                            {currentOrg?.name || "Organizations"}
-                          </SelectValue>
-                          <SelectPrimitive.Icon asChild>
-                            <ChevronsUpDown
-                              size={14}
-                              className="ml-2 text-muted-foreground/80"
+                      <SelectPrimitive.Trigger
+                        className="flex h-8 cursor-pointer w-full items-center justify-between p-1.5 text-foreground"
+                      >
+                        <SelectValue placeholder="Organizations">
+                          {currentOrg?.name || "Organizations"}
+                        </SelectValue>
+                        <SelectPrimitive.Icon asChild>
+                          <ChevronsUpDown
+                            size={14}
+                            className="ml-2 text-muted-foreground/80"
+                          />
+                        </SelectPrimitive.Icon>
+                      </SelectPrimitive.Trigger>
+                      <SelectContent className="w-full sm:w-80 p-1">
+                        <div className="px-2 py-1">
+                          <div className="relative">
+                            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <Input
+                              type="search"
+                              placeholder="Search organizations..."
+                              className="w-full rounded-lg bg-background pl-8 text-xs"
                             />
-                          </SelectPrimitive.Icon>
-                        </SelectPrimitive.Trigger>
-                        <SelectContent className="w-full sm:w-80 p-1">
-                          <div className="px-2 py-1">
-                            <div className="relative">
-                              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                              <Input
-                                type="search"
-                                placeholder="Search organizations..."
-                                className="w-full rounded-lg bg-background pl-8 text-xs"
-                              />
-                            </div>
                           </div>
-                          <div className="h-auto w-full rounded-md overflow-y-auto">
-                            {organizations.map((org) => (
-                              <SelectItem key={org.id} value={org.slug} className="cursor-pointer">
-                                {org.name}
-                              </SelectItem>
-                            ))}
-                          </div>
-                          <SelectSeparator />
-                          <SelectGroup>
-                            <SelectItem value="all" className="cursor-pointer">
-                              All Organizations
+                        </div>
+                        <div className="h-auto w-full rounded-md overflow-y-auto">
+                          {organizations.map((org) => (
+                            <SelectItem key={org.id} value={org.slug} className="cursor-pointer">
+                              {org.name}
                             </SelectItem>
-                          </SelectGroup>
-                          <SelectSeparator />
-                          <Link href="/dashboard/organizations/new" className="flex items-center gap-2 cursor-pointer px-2 py-1.5 text-sm outline-hidden select-none focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50">
-                            <PlusCircle className="h-4 w-4" />
-                            New Organization
-                          </Link>
-                        </SelectContent>
-                      </Select>
+                          ))}
+                        </div>
+                        <SelectSeparator />
+                        <SelectGroup>
+                          <SelectItem value="all" className="cursor-pointer">
+                            All Organizations
+                          </SelectItem>
+                        </SelectGroup>
+                        <SelectSeparator />
+                        <Link href="/dashboard/organizations/new" className="flex items-center gap-2 cursor-pointer px-2 py-1.5 text-sm outline-hidden select-none focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50">
+                          <PlusCircle className="h-4 w-4" />
+                          New Organization
+                        </Link>
+                      </SelectContent>
+                    </Select>
                   </BreadcrumbItem>
                 </React.Fragment>
               )}
@@ -312,9 +261,9 @@ function LayoutContent({ user, avatar, name, children }: LayoutContentProps) {
                           </SelectGroup>
                           <SelectSeparator />
                           <Link href={`/dashboard/organizations/${orgSlug}/projects/new`} className="flex items-center gap-2 cursor-pointer px-2 py-1.5 text-sm outline-hidden select-none focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50">
-                              <PlusCircle className="h-4 w-4" />
-                              New Project
-                    </Link>
+                            <PlusCircle className="h-4 w-4" />
+                            New Project
+                          </Link>
                         </SelectContent>
                       </Select>
                     ) : (
@@ -326,7 +275,7 @@ function LayoutContent({ user, avatar, name, children }: LayoutContentProps) {
                     )}
                   </BreadcrumbItem>
                 </React.Fragment>
-                
+
               )}
 
               {pathname.includes("/organizations/new") && (
@@ -354,12 +303,12 @@ function LayoutContent({ user, avatar, name, children }: LayoutContentProps) {
                     <BreadcrumbPage>Edit Project</BreadcrumbPage>
                   </BreadcrumbItem>
                 </React.Fragment>
-          )}
+              )}
             </BreadcrumbList>
           </Breadcrumb>
         </div>
         <div className="flex items-center gap-3">
-        <button
+          <button
             type="button"
             className="w-7 h-7 cursor-pointer inline-flex items-center justify-center rounded-full border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-black/40 transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-900"
             aria-label="Toggle theme"
@@ -440,7 +389,7 @@ function LayoutContent({ user, avatar, name, children }: LayoutContentProps) {
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => router.push("/")}>
-                
+
                 <span className="text-xs">Homepage</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
