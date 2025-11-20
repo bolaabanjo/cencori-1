@@ -39,6 +39,9 @@ export function GenerateKeyDialog({
             return;
         }
 
+        console.log("🔑 Generating API key with projectId:", projectId);
+        console.log("🔑 API URL:", `/api/projects/${projectId}/api-keys`);
+
         setLoading(true);
         try {
             const response = await fetch(`/api/projects/${projectId}/api-keys`, {
@@ -92,7 +95,7 @@ export function GenerateKeyDialog({
                             <DialogTitle>Generate API Key</DialogTitle>
                             <DialogDescription>
                                 Create a new API key for this project. Give it a descriptive name to help you
-                                remember what it's used for.
+                                remember what it&apos;s used for.
                             </DialogDescription>
                         </DialogHeader>
                         <div className="space-y-4 py-4">
@@ -125,14 +128,13 @@ export function GenerateKeyDialog({
                         <DialogHeader>
                             <DialogTitle>API Key Generated</DialogTitle>
                             <DialogDescription>
-                                Make sure to copy your API key now. You won't be able to see it again!
+                                <div className="flex items-start gap-2 mt-2 p-3 rounded-md bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800">
+                                    <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
+                                    <span className="text-sm text-amber-900 dark:text-amber-100">
+                                        Make sure to copy your API key now. You won&apos;t be able to see it again!
+                                    </span>
+                                </div>
                             </DialogDescription>
-                            <div className="flex items-start gap-2 mt-2 p-3 rounded-md bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800">
-                                <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
-                                <span className="text-sm text-amber-900 dark:text-amber-100">
-                                    This is the only time you'll see the full key. Make sure to copy it now!
-                                </span>
-                            </div>
                         </DialogHeader>
                         <div className="space-y-4 py-4">
                             <div className="space-y-2">

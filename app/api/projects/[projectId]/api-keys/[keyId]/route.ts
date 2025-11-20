@@ -35,7 +35,7 @@ export async function PATCH(
         }
 
         // Check if user owns the organization
-        const orgOwner = (project.organizations as any)?.owner_id;
+        const orgOwner = (project.organizations as { owner_id?: string })?.owner_id;
         if (!orgOwner || orgOwner !== user.id) {
             return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
@@ -99,7 +99,7 @@ export async function DELETE(
         }
 
         // Check if user owns the organization
-        const orgOwner = (project.organizations as any)?.owner_id;
+        const orgOwner = (project.organizations as { owner_id?: string })?.owner_id;
         if (!orgOwner || orgOwner !== user.id) {
             return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
