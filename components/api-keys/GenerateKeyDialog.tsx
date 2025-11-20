@@ -48,7 +48,8 @@ export function GenerateKeyDialog({
             });
 
             if (!response.ok) {
-                throw new Error("Failed to generate API key");
+                const errorData = await response.json().catch(() => ({ error: "Unknown error" }));
+                throw new Error(errorData.error || "Failed to generate API key");
             }
 
             const data = await response.json();
@@ -56,7 +57,8 @@ export function GenerateKeyDialog({
             toast.success("API key generated successfully!");
         } catch (error) {
             console.error("Error generating API key:", error);
-            toast.error("Failed to generate API key");
+            const errorMessage = error instanceof Error ? error.message : "Failed to generate API key";
+            toast.error(errorMessage);
         } finally {
             setLoading(false);
         }
@@ -90,7 +92,7 @@ export function GenerateKeyDialog({
                             <DialogTitle>Generate API Key</DialogTitle>
                             <DialogDescription>
                                 Create a new API key for this project. Give it a descriptive name to help you
-                                remember what it&apos;s used for.
+                                remember what it's used for.
                             </DialogDescription>
                         </DialogHeader>
                         <div className="space-y-4 py-4">
@@ -126,7 +128,7 @@ export function GenerateKeyDialog({
                                 <div className="flex items-start gap-2 mt-2 p-3 rounded-md bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800">
                                     <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
                                     <span className="text-sm text-amber-900 dark:text-amber-100">
-                                        Make sure to copy your API key now. You won&apos;t be able to see it again!
+                                        Make sure to copy your API key now. You won't be able to see it again!
                                     </span>
                                 </div>
                             </DialogDescription>

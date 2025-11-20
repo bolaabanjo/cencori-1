@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+import { createServerClient } from "@/lib/supabaseServer";
 import { generateApiKey, hashApiKey, extractKeyPrefix, getKeyLastFour } from "@/lib/api-keys";
 
 /**
@@ -9,11 +8,11 @@ import { generateApiKey, hashApiKey, extractKeyPrefix, getKeyLastFour } from "@/
  */
 export async function GET(
     request: NextRequest,
-    { params }: { params: { projectId: string } }
+    { params }: { params: Promise<{ projectId: string }> }
 ) {
     try {
-        const supabase = createRouteHandlerClient({ cookies });
-        const { projectId } = params;
+        const supabase = await createServerClient();
+        const { projectId } = await params;
 
         // Get the current user
         const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -37,7 +36,8 @@ export async function GET(
         }
 
         // Check if user owns the organization
-        if (project.organizations[0].owner_id !== user.id) {
+        const orgOwner = (project.organizations as any)?.owner_id;
+        if (!orgOwner || orgOwner !== user.id) {
             return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
 
@@ -76,11 +76,11 @@ export async function GET(
  */
 export async function POST(
     request: NextRequest,
-    { params }: { params: { projectId: string } }
+    { params }: { params: Promise<{ projectId: string }> }
 ) {
     try {
-        const supabase = createRouteHandlerClient({ cookies });
-        const { projectId } = params;
+        const supabase = await createServerClient();
+        const { projectId } = await params;
         const body = await request.json();
         const { name } = body;
 
@@ -110,7 +110,8 @@ export async function POST(
         }
 
         // Check if user owns the organization
-        if (project.organizations[0].owner_id !== user.id) {
+        const orgOwner = (project.organizations as any)?.owner_id;
+        if (!orgOwner || orgOwner !== user.id) {
             return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
 
